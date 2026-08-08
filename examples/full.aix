@@ -1,0 +1,179 @@
+{
+  "aix_envelope": {
+    "aix_version": "0.1",
+    "created_at": "2026-08-08T23:07:31.315980+00:00",
+    "updated_at": "2026-08-08T23:07:31.316412+00:00",
+    "subject_id": "founder_hash_abc123",
+    "device_id": "macbook_hash_xyz789",
+    "session_id": "session_2026_08",
+    "memory_count": 3,
+    "checksum": "f90ed9e4165d8ae58f974337ff2ba547a5a9859c68a8fcea36de1a44bec19b6e",
+    "permissions": {
+      "read": [
+        "self"
+      ],
+      "write": [
+        "self"
+      ],
+      "share": [
+        "self"
+      ]
+    },
+    "pii_protected": false,
+    "substrate_version": "1.0"
+  },
+  "aix_identity": {
+    "active_roles": [
+      {
+        "role": "founder",
+        "frequency": 20,
+        "last_seen": "2026-08-08T23:07:31.316022+00:00"
+      },
+      {
+        "role": "creator",
+        "frequency": 15,
+        "last_seen": "2026-08-08T23:07:31.316183+00:00"
+      }
+    ],
+    "goals": [
+      {
+        "goal": "Publish .aix as an open standard",
+        "domain": "product",
+        "confidence": 0.9
+      }
+    ],
+    "intentions": [
+      {
+        "intention": "Grow ecosystem adoption of .aix",
+        "horizon": "quarter",
+        "confidence": 0.75
+      }
+    ],
+    "graph_stats": {
+      "entities": 276,
+      "semantic_relations": 1612,
+      "causal_edges": 1213,
+      "graph_density": 5.84,
+      "life_events": 8
+    },
+    "verification_mean": 0.7067,
+    "last_consolidated": "2026-08-08T23:07:31.316397+00:00"
+  },
+  "memories": [
+    {
+      "id": "4feb5926-5130-482c-8cba-6744f3331c40",
+      "timestamp": "2026-08-08T23:07:31.316022+00:00",
+      "source": "apple_notes",
+      "role": "founder",
+      "tier": "ltm",
+      "epic_score": 0.78,
+      "verification_score": 0.85,
+      "pii_protected": false,
+      "content": {
+        "text": "Closed the pre-seed conversation with three LOIs signed.",
+        "entities": [
+          "Geometrical",
+          "pre-seed"
+        ],
+        "decisions": [
+          "Move forward with pre-seed close"
+        ],
+        "intentions": [],
+        "emotions": [],
+        "patterns": [],
+        "porques": [
+          "Need runway to ship .aix v1.0"
+        ]
+      },
+      "embeddings": {
+        "model": null,
+        "vector": null
+      },
+      "trace": {
+        "latitude": 41.3874,
+        "longitude": 2.1686,
+        "location_name": "Barcelona, Spain",
+        "local_time": "2026-08-09T01:07:31.316108+02:00",
+        "timezone": "+02:00",
+        "device_type": "laptop"
+      }
+    },
+    {
+      "id": "826a8e79-5390-4ff7-ada3-dc347fc2451e",
+      "timestamp": "2026-08-08T23:07:31.316183+00:00",
+      "source": "keyboard",
+      "role": "creator",
+      "tier": "mtm",
+      "epic_score": 0.65,
+      "verification_score": 0.72,
+      "pii_protected": false,
+      "content": {
+        "text": "Drafted the .aix envelope schema -- permissions model still needs a review pass.",
+        "entities": [],
+        "decisions": [],
+        "intentions": [
+          "Publish .aix spec as an open standard"
+        ],
+        "emotions": [],
+        "patterns": [
+          "writes technical specs before code"
+        ],
+        "porques": []
+      },
+      "embeddings": {
+        "model": null,
+        "vector": null
+      },
+      "trace": {
+        "latitude": null,
+        "longitude": null,
+        "location_name": null,
+        "local_time": "2026-08-09T01:07:31.316239+02:00",
+        "timezone": "+02:00",
+        "device_type": "desktop"
+      }
+    },
+    {
+      "id": "fbc1b34d-aac5-4f5e-bd66-e7ae028d31e7",
+      "timestamp": "2026-08-08T23:07:31.316299+00:00",
+      "source": "safari_history",
+      "role": "researcher",
+      "tier": "stm",
+      "epic_score": 0.4,
+      "verification_score": 0.55,
+      "pii_protected": false,
+      "content": {
+        "text": "Read a paper on portable agent memory formats for comparison research.",
+        "entities": [
+          "arXiv"
+        ],
+        "decisions": [],
+        "intentions": [],
+        "emotions": [
+          "curiosity"
+        ],
+        "patterns": [],
+        "porques": []
+      },
+      "embeddings": {
+        "model": null,
+        "vector": null
+      },
+      "trace": {
+        "latitude": null,
+        "longitude": null,
+        "location_name": null,
+        "local_time": "2026-08-09T01:07:31.316350+02:00",
+        "timezone": "+02:00",
+        "device_type": "mobile"
+      }
+    }
+  ],
+  "aix_trace": {
+    "origin_device": "macbook_hash_xyz789",
+    "origin_platform": "macos",
+    "export_timestamp": "2026-08-08T23:07:31.316868+00:00",
+    "exporter": "aix_parser.py-v0.1",
+    "integrity_hash": "c45c1c13c1b5d10aeba3dc5537ad733238450e4beb7a3403af6c8bf5feb380ad"
+  }
+}

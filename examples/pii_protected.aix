@@ -1,0 +1,98 @@
+{
+  "aix_envelope": {
+    "aix_version": "0.1",
+    "created_at": "2026-08-08T23:07:31.317869+00:00",
+    "updated_at": "2026-08-08T23:07:31.318071+00:00",
+    "subject_id": "founder_hash_abc123",
+    "device_id": "macbook_hash_xyz789",
+    "session_id": "session_2026_08_shared",
+    "memory_count": 1,
+    "checksum": "a452e6ca8c2a0d97d427f21527c4fa3f43a97ad328670fd362b4671eeedab7fa",
+    "permissions": {
+      "read": [
+        "self"
+      ],
+      "write": [
+        "self"
+      ],
+      "share": [
+        "soma:example_org_id"
+      ]
+    },
+    "pii_protected": true,
+    "substrate_version": "1.0"
+  },
+  "aix_identity": {
+    "active_roles": [
+      {
+        "role": "founder",
+        "frequency": 20,
+        "last_seen": "2026-08-08T23:07:31.317912+00:00"
+      }
+    ],
+    "goals": [
+      {
+        "goal": "Publish .aix as an open standard",
+        "domain": "product",
+        "confidence": 0.9
+      }
+    ],
+    "intentions": [],
+    "graph_stats": {
+      "entities": 276,
+      "semantic_relations": 1612,
+      "causal_edges": 1213,
+      "graph_density": 5.84,
+      "life_events": 8
+    },
+    "verification_mean": 0.85,
+    "last_consolidated": "2026-08-08T23:07:31.318055+00:00"
+  },
+  "memories": [
+    {
+      "id": "e1e514cf-b80a-4b34-a19b-5db30578a6c6",
+      "timestamp": "2026-08-08T23:07:31.317912+00:00",
+      "source": "apple_notes",
+      "role": "founder",
+      "tier": "ltm",
+      "epic_score": 0.78,
+      "verification_score": 0.85,
+      "pii_protected": true,
+      "content": {
+        "text": "[PERSONA_1] closed the pre-seed conversation with [PERSONA_2] and [PERSONA_3] -- LOIs signed for [PROYECTO_1]. Contact: [EMAIL_1].",
+        "entities": [
+          "[PROYECTO_1]",
+          "pre-seed"
+        ],
+        "decisions": [
+          "Move forward with pre-seed close"
+        ],
+        "intentions": [],
+        "emotions": [],
+        "patterns": [],
+        "porques": [
+          "Illustrative example only -- tokens like [PERSONA_1] are placeholders, not the real transformation output. The actual mechanism is implementation-defined per AIX-SPEC.md Section 5; Geometrical's reference implementation is covered by Patent Application P202631047 (OEPM)."
+        ]
+      },
+      "embeddings": {
+        "model": null,
+        "vector": null
+      },
+      "trace": {
+        "latitude": null,
+        "longitude": null,
+        "location_name": null,
+        "local_time": "2026-08-09T01:07:31.317998+02:00",
+        "timezone": "+02:00",
+        "device_type": "laptop"
+      }
+    }
+  ],
+  "aix_trace": {
+    "origin_device": "macbook_hash_xyz789",
+    "origin_platform": "macos",
+    "export_timestamp": "2026-08-08T23:07:31.318415+00:00",
+    "exporter": "aix_parser.py-v0.1",
+    "integrity_hash": "3415f2a5f40daabd119507240cf873d94ad87fd0283afd9496475caaa0fd47df"
+  }
+}
