@@ -124,6 +124,21 @@ class TestAIXEnvelope(unittest.TestCase):
         # igual que el original (mismo checksum declarado == recalculado).
         self.assertEqual(reloaded.validate(), env.validate())
 
+    def test_aix_version_preserved_on_load_not_current_constant(self):
+        """Regresión: from_dict()/to_dict() deben preservar el aix_version
+        TAL COMO ESTABA en el archivo cargado, no pisarlo con la constante
+        AIX_VERSION vigente del parser -- un archivo v0.1 cargado por un
+        parser que hoy emite v0.2 tiene que seguir reportándose v0.1."""
+        d = {"aix_envelope": {"aix_version": "0.1", "subject_id": "s1", "device_id": "d1"}, "memories": []}
+        cargado = AIXEnvelope.from_dict(d)
+        self.assertEqual(cargado.to_dict()["aix_envelope"]["aix_version"], "0.1")
+
+        # Un envelope NUEVO (no cargado) sí usa la versión actual del módulo.
+        import aix_parser
+
+        nuevo = AIXEnvelope(subject_id="s1", device_id="d1", session_id="sess1")
+        self.assertEqual(nuevo.to_dict()["aix_envelope"]["aix_version"], aix_parser.AIX_VERSION)
+
     def test_to_file_and_from_file(self):
         env = AIXEnvelope(subject_id="s1", device_id="d1", session_id="sess1")
         env.add_memory(AIXMemory(source="apple_notes", role="founder", content={"text": "x"}))

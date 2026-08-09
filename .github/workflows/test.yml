@@ -25,7 +25,7 @@ jobs:
           from aix_parser import AIXEnvelope
           import sys
 
-          files = ['examples/minimal.aix', 'examples/full.aix', 'examples/pii_protected.aix']
+          files = ['examples/minimal.aix', 'examples/full.aix', 'examples/pii_protected.aix', 'examples/soma_contract.aix']
           failed = False
           for f in files:
               is_valid, errors = AIXEnvelope.from_file(f).validate()

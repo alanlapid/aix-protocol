@@ -1,0 +1,213 @@
+{
+  "aix_envelope": {
+    "aix_version": "0.2",
+    "created_at": "2026-08-08T23:56:09.023082+00:00",
+    "updated_at": "2026-08-08T23:56:09.023729+00:00",
+    "subject_id": "soma_acme_corp_hash",
+    "device_id": "soma_ingestion_pipeline_01",
+    "session_id": "contract_batch_2026_08",
+    "memory_count": 3,
+    "checksum": "e53ec6c3eebc0ad826152690f56a6e27043e90d1319d95452595fdb8865aa3e2",
+    "permissions": {
+      "read": [
+        "self"
+      ],
+      "write": [
+        "self"
+      ],
+      "share": []
+    },
+    "pii_protected": true,
+    "substrate_version": "1.0",
+    "token_budget": {
+      "max_tokens": 8000,
+      "used_tokens": 3200,
+      "compression": "gzip"
+    },
+    "signature": {
+      "algorithm": "merkle-sha256",
+      "root": "61c2ca5df9f8fbe4e5f037add7e67911695351dda98dd660ff96e62221c55880",
+      "signed_at": "2026-08-08T23:56:09.023721+00:00"
+    },
+    "federate": {
+      "soma:acme_corp_legal": {
+        "roles": [
+          "legal_team"
+        ],
+        "fields": [
+          "text",
+          "entities",
+          "decisions",
+          "intentions",
+          "emotions",
+          "patterns",
+          "porques"
+        ],
+        "expires_at": null,
+        "read_only": false
+      },
+      "soma:acme_corp_advisory": {
+        "roles": [
+          "advisor"
+        ],
+        "fields": [
+          "decisions",
+          "entities"
+        ],
+        "expires_at": "2027-08-01T00:00:00Z",
+        "read_only": true
+      }
+    }
+  },
+  "aix_identity": {
+    "active_roles": [
+      {
+        "role": "legal_analyst",
+        "frequency": 3,
+        "last_seen": "2026-08-08T23:56:09.023478+00:00"
+      }
+    ],
+    "goals": [
+      {
+        "goal": "Maintain compliant contract repository",
+        "domain": "legal",
+        "confidence": 0.85
+      }
+    ],
+    "intentions": [],
+    "graph_stats": {
+      "entities": 3,
+      "semantic_relations": 4,
+      "causal_edges": 0,
+      "graph_density": 1.33,
+      "life_events": 0
+    },
+    "verification_mean": 0.8433,
+    "last_consolidated": "2026-08-08T23:56:09.023518+00:00"
+  },
+  "memories": [
+    {
+      "id": "a1172ebf-668b-4422-920f-f14856640e52",
+      "timestamp": "2026-08-08T23:56:09.023323+00:00",
+      "source": "soma_ingest",
+      "role": "legal_analyst",
+      "doc_type": "document",
+      "tier": "ltm",
+      "epic_score": 0.71,
+      "verification_score": 0.88,
+      "pii_protected": true,
+      "content": {
+        "text": "Termination clause: either party may terminate with 60 days written notice if a breach by [PROYECTO_1] or [PERSONA_1] remains unremedied after the cure period.",
+        "entities": [
+          "[PERSONA_1]",
+          "[PROYECTO_1]"
+        ],
+        "decisions": [
+          "Terminate agreement with 60-day notice if breach unremedied"
+        ],
+        "intentions": [],
+        "emotions": [],
+        "patterns": [
+          "Standard indemnification clause with mutual liability cap"
+        ],
+        "porques": []
+      },
+      "embeddings": {
+        "model": null,
+        "vector": null
+      },
+      "trace": {
+        "latitude": null,
+        "longitude": null,
+        "location_name": null,
+        "local_time": "2026-08-09T01:56:09.023337+02:00",
+        "timezone": "+02:00",
+        "device_type": "unknown"
+      }
+    },
+    {
+      "id": "e2f48b8d-cc0a-42d1-ae83-1d9154552f12",
+      "timestamp": "2026-08-08T23:56:09.023422+00:00",
+      "source": "soma_ingest",
+      "role": "legal_analyst",
+      "doc_type": "document",
+      "tier": "ltm",
+      "epic_score": 0.58,
+      "verification_score": 0.81,
+      "pii_protected": true,
+      "content": {
+        "text": "Payment terms: [PROYECTO_1] agrees to Net-30 payment terms with a 1.5% monthly late fee on overdue balances.",
+        "entities": [
+          "[PROYECTO_1]"
+        ],
+        "decisions": [
+          "Net-30 payment terms with 1.5% monthly late fee"
+        ],
+        "intentions": [],
+        "emotions": [],
+        "patterns": [
+          "Late payment triggers automatic escalation to collections after 90 days"
+        ],
+        "porques": []
+      },
+      "embeddings": {
+        "model": null,
+        "vector": null
+      },
+      "trace": {
+        "latitude": null,
+        "longitude": null,
+        "location_name": null,
+        "local_time": "2026-08-09T01:56:09.023431+02:00",
+        "timezone": "+02:00",
+        "device_type": "unknown"
+      }
+    },
+    {
+      "id": "fc58b96c-430e-4f4b-9c0e-3a91dfbc447f",
+      "timestamp": "2026-08-08T23:56:09.023478+00:00",
+      "source": "soma_ingest",
+      "role": "legal_analyst",
+      "doc_type": "document",
+      "tier": "ltm",
+      "epic_score": 0.63,
+      "verification_score": 0.84,
+      "pii_protected": true,
+      "content": {
+        "text": "Renewal clause: this agreement auto-renews annually unless either party gives 90 days written notice, signed by [PERSONA_2] on behalf of [PROYECTO_1].",
+        "entities": [
+          "[PERSONA_2]",
+          "[PROYECTO_1]"
+        ],
+        "decisions": [
+          "Auto-renews annually unless either party gives 90-day written notice"
+        ],
+        "intentions": [],
+        "emotions": [],
+        "patterns": [
+          "Standard auto-renewal clause common in enterprise SaaS contracts"
+        ],
+        "porques": []
+      },
+      "embeddings": {
+        "model": null,
+        "vector": null
+      },
+      "trace": {
+        "latitude": null,
+        "longitude": null,
+        "location_name": null,
+        "local_time": "2026-08-09T01:56:09.023485+02:00",
+        "timezone": "+02:00",
+        "device_type": "unknown"
+      }
+    }
+  ],
+  "aix_trace": {
+    "origin_device": "soma_ingestion_pipeline_01",
+    "origin_platform": "macos",
+    "export_timestamp": "2026-08-08T23:56:09.024075+00:00",
+    "exporter": "aix_parser.py-v0.2",
+    "integrity_hash": "c2bf910320b210bc26c65ef3cdc203af9cdebbfd4ebc71836f2eab5521a365c6"
+  }
+}

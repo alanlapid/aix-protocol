@@ -2,7 +2,7 @@
 
 > The open format for portable episodic identity memory.
 
-[![Spec Version](https://img.shields.io/badge/spec-v0.1-orange)](AIX-SPEC.md)
+[![Spec Version](https://img.shields.io/badge/spec-v0.2-orange)](AIX-SPEC.md)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Status](https://img.shields.io/badge/status-draft-yellow)](https://github.com/alanlapid/aix-protocol)
 [![Tests](https://github.com/alanlapid/aix-protocol/actions/workflows/test.yml/badge.svg)](https://github.com/alanlapid/aix-protocol/actions/workflows/test.yml)
@@ -34,6 +34,36 @@ Key properties:
 - **Privacy-preserving**: PII transformation before transmission
 - **Portable**: iOS, Android, macOS, Linux, wearables
 - **Versioned**: semantic versioning of the episodic substrate
+
+## AIX Protocol Stack
+
+```
+AIX Protocol
+├── .aix format     — the memory envelope (this spec)
+├── Nexus v0.1      — permission and federation layer
+│   ├── federate    — granular field-level permissions
+│   ├── perimeters  — self / soma / axis / public
+│   └── integrity   — Merkle signature
+└── Transport       — how envelopes move (v0.2)
+
+Used by:
+├── Self    — personal episodic memory substrate
+├── Soma    — institutional memory substrate
+└── Axis    — autonomous agent memory substrate
+```
+
+Nexus v0.1 ships inside this repo (`AIX-SPEC.md` Section 11) — it'll
+move to its own repository once it outgrows being a subsection here.
+
+## Token Reduction
+
+`.aix` reduces context token consumption by 35–78% vs. raw text
+injection through Knowledge Compiler preprocessing (deduplication +
+JSON distillation).
+
+The `token_budget` field enables agents to plan context usage before
+loading an envelope. See `AIX-SPEC.md` Section 3.6 and, for the
+enterprise-scale numbers, `SOMA-USAGE.md`.
 
 ## Quick Start
 
@@ -71,6 +101,25 @@ env2 = AIXEnvelope.from_file("my_memory.aix")
 ## Specification
 
 Read the full spec: [AIX-SPEC.md](AIX-SPEC.md)
+
+## Comparison
+
+| Format | Episodic identity | Local-first | PII layer | Federation | Token reduction |
+|---|---|---|---|---|---|
+| **.aix** (this) | ✅ 9-DIM | ✅ | ✅ patent | ✅ Nexus | ✅ 35–78% |
+| PAM (MS, 2605.11032) | ✗ | ✗ | ✗ | ✗ | ✗ |
+| MemGPT context | ✗ | ✗ | ✗ | ✗ | ✗ |
+| JSON-LD | ✗ | ✓ | ✗ | ✗ | ✗ |
+
+Same table lives in `AIX-SPEC.md` Section 7, kept in sync with this one.
+
+## Use Cases
+
+- [Personal Memory (Self)](AIX-SPEC.md)
+- [Enterprise Memory (Soma)](SOMA-USAGE.md)
+- [Agent Memory (Axis)](AIX-SPEC.md) — no dedicated Axis section yet;
+  Axis consumes the same `.aix` format as Self and Soma.
+- [Federation (Nexus)](AIX-SPEC.md#11-nexus-protocol-v01)
 
 ## Why Open?
 
