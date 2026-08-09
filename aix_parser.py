@@ -1,5 +1,8 @@
 """
-aix_parser.py — Reference implementation of the .aix format (spec v0.1).
+aix_parser.py — Reference implementation of the .aix format (spec v0.2:
+v0.1's schema plus token_budget, signature/Merkle, federate/Nexus, and
+doc_type -- all optional, so v0.1 files remain valid, see AIX-SPEC.md
+Section 6).
 
 Pure Python standard library, no third-party dependencies. See
 AIX-SPEC.md in this repository for the full format specification.
@@ -31,10 +34,21 @@ import uuid
 from datetime import datetime, timezone
 from typing import Any
 
-AIX_VERSION = "0.1"
+AIX_VERSION = "0.2"
 
 ALLOWED_TIERS = ("stm", "mtm", "ltm", "archival")
 ALLOWED_DEVICE_TYPES = ("mobile", "laptop", "desktop", "wearable", "unknown")
+ALLOWED_DOC_TYPES = (
+    "note",
+    "email",
+    "message",
+    "document",
+    "audio",
+    "photo",
+    "action",
+    "web",
+)
+ALLOWED_COMPRESSION = ("none", "gzip", "lz4")
 CONTENT_FIELDS = (
     "text",
     "entities",
@@ -44,6 +58,7 @@ CONTENT_FIELDS = (
     "patterns",
     "porques",
 )
+FEDERATE_RULE_FIELDS = ("roles", "fields", "expires_at", "read_only")
 
 _PLATFORM_MAP = {
     "darwin": "macos",
@@ -81,6 +96,7 @@ class AIXMemory:
         self.timestamp = _now_iso()
         self.source = source
         self.role = role
+        self.doc_type: str | None = None
         self.content = self._normalize_content(content)
         self.tier = "stm"
         self.epic_score: float | None = None
@@ -140,20 +156,41 @@ class AIXMemory:
             raise ValueError(f"tier debe ser uno de {ALLOWED_TIERS}, recibido: {tier!r}")
         self.tier = tier
 
+    def set_doc_type(self, doc_type: str) -> None:
+        """AIX-SPEC.md Section 3.4 -- optional (v0.2), content-type
+        categorization. Most relevant for Soma enterprise ingestion, see
+        SOMA-USAGE.md."""
+        if doc_type not in ALLOWED_DOC_TYPES:
+            raise ValueError(f"doc_type debe ser uno de {ALLOWED_DOC_TYPES}, recibido: {doc_type!r}")
+        self.doc_type = doc_type
+
     def to_dict(self) -> dict[str, Any]:
-        return {
+        d: dict[str, Any] = {
             "id": self.id,
             "timestamp": self.timestamp,
             "source": self.source,
             "role": self.role,
-            "tier": self.tier,
-            "epic_score": self.epic_score,
-            "verification_score": self.verification_score,
-            "pii_protected": self.pii_protected,
-            "content": dict(self.content),
-            "embeddings": dict(self.embeddings),
-            "trace": dict(self.trace),
         }
+        # doc_type es opcional (v0.2) -- AUSENTE del dict si nunca se
+        # llamó set_doc_type(), no presente-con-null, para reflejar
+        # "optional field" tal cual lo describe AIX-SPEC.md (un archivo
+        # v0.1 sin este campo sigue siendo válido, no un v0.2 con el
+        # campo en None). Insertado acá, entre 'role' y 'tier', para que
+        # el JSON serializado siga el mismo orden que AIX-SPEC.md 3.4.
+        if self.doc_type is not None:
+            d["doc_type"] = self.doc_type
+        d.update(
+            {
+                "tier": self.tier,
+                "epic_score": self.epic_score,
+                "verification_score": self.verification_score,
+                "pii_protected": self.pii_protected,
+                "content": dict(self.content),
+                "embeddings": dict(self.embeddings),
+                "trace": dict(self.trace),
+            }
+        )
+        return d
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "AIXMemory":
@@ -166,6 +203,7 @@ class AIXMemory:
         memoria.timestamp = d["timestamp"]
         memoria.source = d["source"]
         memoria.role = d["role"]
+        memoria.doc_type = d.get("doc_type")
         memoria.tier = d.get("tier", "stm")
         memoria.epic_score = d.get("epic_score")
         memoria.verification_score = d.get("verification_score")
@@ -201,6 +239,13 @@ class AIXEnvelope:
         self.device_id = device_id
         self.session_id = session_id
         self.substrate_version = substrate_version
+        # Un envelope NUEVO (construido acá, no cargado) es de la versión
+        # ACTUAL del parser. from_dict() lo pisa con lo que de verdad decía
+        # el archivo -- ver comentario ahí sobre por qué to_dict() no debe
+        # "corregir" esto solo (mismo principio que checksum/trace: un v0.1
+        # cargado tiene que seguir reportándose como v0.1, no como
+        # "lo que sea que AIX_VERSION valga hoy").
+        self.aix_version = AIX_VERSION
 
         self.created_at = _now_iso()
         self.updated_at = self.created_at
@@ -208,6 +253,18 @@ class AIXEnvelope:
         self.memories: list[AIXMemory] = []
         self.permissions: dict[str, list[str]] = {"read": ["self"], "write": ["self"], "share": []}
         self.identity: dict[str, Any] = self._empty_identity()
+
+        # Los 3 campos opcionales de v0.2 (AIX-SPEC.md 3.3) -- None =
+        # "ausente", igual que doc_type en AIXMemory. No se cachean ni se
+        # recalculan solos: token_budget/federate se setean explícitamente
+        # (set_token_budget()/set_federate()), signature se llena con
+        # sign() -- y si se muta el envelope DESPUÉS de firmarlo, la firma
+        # queda desactualizada a propósito (validate() la va a marcar como
+        # inválida contra el merkle root recalculado, igual que pasaría con
+        # una firma real sobre datos que cambiaron).
+        self.token_budget: dict[str, Any] | None = None
+        self.federate: dict[str, Any] | None = None
+        self.signature: dict[str, Any] | None = None
 
         # None = "compute fresh at to_dict() time" (el estado normal de un
         # envelope armado en memoria). from_dict()/from_json() los pisan
@@ -268,6 +325,68 @@ class AIXEnvelope:
         self.permissions = {"read": list(read), "write": list(write), "share": list(share)}
         self.updated_at = _now_iso()
 
+    def set_token_budget(self, max_tokens: int, used_tokens: int, compression: str = "none") -> None:
+        """AIX-SPEC.md Section 3.3 / 3.6 -- optional (v0.2). Lets a
+        receiving agent plan context usage before loading the envelope."""
+        if compression not in ALLOWED_COMPRESSION:
+            raise ValueError(f"compression debe ser uno de {ALLOWED_COMPRESSION}, recibido: {compression!r}")
+        self.token_budget = {
+            "max_tokens": max_tokens,
+            "used_tokens": used_tokens,
+            "compression": compression,
+        }
+        self.updated_at = _now_iso()
+
+    def set_federate(self, rules: dict[str, dict[str, Any]]) -> None:
+        """AIX-SPEC.md Section 3.5 -- Nexus v0.1 permissions, optional.
+        'rules' es un dict {perimeter_key: {roles, fields, expires_at,
+        read_only}}, ej. {"soma:bank_001": {"roles": [...], ...}}.
+
+        Falla rápido (ValueError) acá si la forma está mal; validate()
+        hace el mismo chequeo de forma NO-fatal para envelopes cargados de
+        un archivo externo que pudo llegar mal formado."""
+        for perimetro, regla in rules.items():
+            faltantes = [campo for campo in FEDERATE_RULE_FIELDS if campo not in regla]
+            if faltantes:
+                raise ValueError(f"federate[{perimetro!r}] le faltan campos: {faltantes}")
+        self.federate = dict(rules)
+        self.updated_at = _now_iso()
+
+    def compute_merkle(self) -> str:
+        """Merkle root sobre memories[] TAL COMO ESTÁ AHORA -- función pura
+        de self.memories, igual que compute_checksum(). Un árbol Merkle de
+        verdad (no un hash plano de la concatenación): cada memoria es una
+        hoja (sha256 de su to_dict()), los niveles se combinan de a pares
+        (sha256 de la concatenación de los dos hijos) hasta quedar un solo
+        root; con cantidad impar de nodos en un nivel, el último se
+        duplica (convención estándar de árboles Merkle). Cualquier cambio
+        en cualquier memoria cambia el root -- eso es lo que sign()/
+        validate() usan para detectar tampering."""
+        hojas = [_sha256_of(m.to_dict()) for m in self.memories]
+        if not hojas:
+            return _sha256_of([])
+
+        nivel = hojas
+        while len(nivel) > 1:
+            siguiente = []
+            for i in range(0, len(nivel), 2):
+                izquierda = nivel[i]
+                derecha = nivel[i + 1] if i + 1 < len(nivel) else nivel[i]
+                siguiente.append(hashlib.sha256((izquierda + derecha).encode("utf-8")).hexdigest())
+            nivel = siguiente
+        return nivel[0]
+
+    def sign(self) -> None:
+        """Popula 'signature' con el Merkle root actual. Si el envelope se
+        muta DESPUÉS de firmarlo (add_memory(), etc.), la firma queda
+        desactualizada a propósito -- ver comentario en __init__."""
+        self.signature = {
+            "algorithm": "merkle-sha256",
+            "root": self.compute_merkle(),
+            "signed_at": _now_iso(),
+        }
+        self.updated_at = _now_iso()
+
     def compute_checksum(self) -> str:
         """sha256 del array 'memories' TAL COMO ESTÁ AHORA -- siempre en
         vivo, nunca cachea. validate() la usa para detectar si el checksum
@@ -316,20 +435,31 @@ class AIXEnvelope:
             self._loaded_trace = self._generate_trace()
         trace = self._loaded_trace
 
+        envelope: dict[str, Any] = {
+            "aix_version": self.aix_version,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "subject_id": self.subject_id,
+            "device_id": self.device_id,
+            "session_id": self.session_id,
+            "memory_count": len(self.memories),
+            "checksum": checksum,
+            "permissions": dict(self.permissions),
+            "pii_protected": any(m.pii_protected for m in self.memories),
+            "substrate_version": self.substrate_version,
+        }
+        # token_budget/signature/federate son opcionales (v0.2) -- AUSENTES
+        # del dict si nunca se llamó al setter correspondiente, mismo
+        # criterio que doc_type en AIXMemory.to_dict().
+        if self.token_budget is not None:
+            envelope["token_budget"] = dict(self.token_budget)
+        if self.signature is not None:
+            envelope["signature"] = dict(self.signature)
+        if self.federate is not None:
+            envelope["federate"] = dict(self.federate)
+
         return {
-            "aix_envelope": {
-                "aix_version": AIX_VERSION,
-                "created_at": self.created_at,
-                "updated_at": self.updated_at,
-                "subject_id": self.subject_id,
-                "device_id": self.device_id,
-                "session_id": self.session_id,
-                "memory_count": len(self.memories),
-                "checksum": checksum,
-                "permissions": dict(self.permissions),
-                "pii_protected": any(m.pii_protected for m in self.memories),
-                "substrate_version": self.substrate_version,
-            },
+            "aix_envelope": envelope,
             "aix_identity": identidad,
             "memories": [m.to_dict() for m in self.memories],
             "aix_trace": trace,
@@ -347,6 +477,7 @@ class AIXEnvelope:
         envelope_data = d.get("aix_envelope", {})
 
         env = cls.__new__(cls)
+        env.aix_version = envelope_data.get("aix_version", AIX_VERSION)
         env.subject_id = envelope_data.get("subject_id", "")
         env.device_id = envelope_data.get("device_id", "")
         env.session_id = envelope_data.get("session_id", "")
@@ -358,6 +489,10 @@ class AIXEnvelope:
         )
         env.identity = dict(d.get("aix_identity") or cls._empty_identity())
         env.memories = [AIXMemory.from_dict(m) for m in d.get("memories", [])]
+
+        env.token_budget = envelope_data.get("token_budget")
+        env.federate = envelope_data.get("federate")
+        env.signature = envelope_data.get("signature")
 
         # Congela lo que YA estaba en el archivo -- ver comentario en
         # __init__ sobre por qué to_dict() no debe "corregir" esto solo.
@@ -411,6 +546,39 @@ class AIXEnvelope:
                 errores.append(f"memories[{i}]: 'role' vacío o ausente.")
             if not memoria.content.get("text"):
                 errores.append(f"memories[{i}]: 'content.text' vacío o ausente.")
+            doc_type = getattr(memoria, "doc_type", None)
+            if doc_type is not None and doc_type not in ALLOWED_DOC_TYPES:
+                errores.append(f"memories[{i}]: doc_type inválido: {doc_type!r} (esperado uno de {ALLOWED_DOC_TYPES}).")
+
+        # signature (v0.2, opcional): si está presente, el root declarado
+        # tiene que coincidir con el Merkle root recalculado sobre
+        # memories[] TAL COMO ESTÁN AHORA -- mismo principio que el chequeo
+        # de checksum de arriba, pero para el árbol Merkle en vez del hash
+        # plano.
+        if self.signature is not None:
+            root_declarado = self.signature.get("root")
+            root_real = self.compute_merkle()
+            if root_declarado != root_real:
+                errores.append(
+                    f"signature.root no coincide: declarado {root_declarado!r}, "
+                    f"calculado {root_real!r} -- la firma quedó desactualizada "
+                    "respecto de memories[] actuales."
+                )
+
+        # federate (Nexus v0.1, opcional): cada regla necesita los 4 campos
+        # del contrato (AIX-SPEC.md 3.5) -- no valida los VALORES (roles
+        # arbitrarios, fechas, etc.), solo que la forma esté completa.
+        if self.federate is not None:
+            if not isinstance(self.federate, dict):
+                errores.append("federate no es un objeto.")
+            else:
+                for perimetro, regla in self.federate.items():
+                    if not isinstance(regla, dict):
+                        errores.append(f"federate[{perimetro!r}] no es un objeto.")
+                        continue
+                    faltantes = [campo for campo in FEDERATE_RULE_FIELDS if campo not in regla]
+                    if faltantes:
+                        errores.append(f"federate[{perimetro!r}] le faltan campos: {faltantes}.")
 
         return (len(errores) == 0, errores)
 
