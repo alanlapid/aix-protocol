@@ -128,7 +128,7 @@ The episodic identity layer is infrastructure, not product.
 No one monetizes TCP/IP. No one monetizes JSON.
 Everyone monetizes what they build on top.
 
-`.aix` is the protocol. [Geometrical](https://geometrical.ai) builds
+`.aix` is the protocol. [Geometrical](https://thegeometrical.com) builds
 Self, Soma, Nexus, and Axis — the surfaces that implement it with
 production quality, privacy guarantees, and enterprise governance.
 
@@ -143,7 +143,7 @@ Publishing `.aix` open means:
 
 | Project | Type | Status |
 |---|---|---|
-| [Self](https://geometrical.ai) | Personal episodic substrate | v1.1 production |
+| [Self](https://thegeometrical.com) | Personal episodic substrate | v1.1 production |
 | Your project here | — | Submit a PR |
 
 ## Badge
@@ -167,4 +167,4 @@ Governance opens to the community at v1.0.
 
 ---
 
-*Built by [Geometrical](https://geometrical.ai) · Patent P202631047 (OEPM) · August 2026*
+*Built by [Geometrical](https://thegeometrical.com) · Patent P202631047 (OEPM) · August 2026*

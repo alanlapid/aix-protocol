@@ -338,7 +338,7 @@ sync with this one.
 See [`aix_parser.py`](aix_parser.py) in this repository.
 
 - **Implemented by:** Self v1.1 (Geometrical)
-- **Website:** [geometrical.ai](https://geometrical.ai)
+- **Website:** [thegeometrical.com](https://thegeometrical.com)
 
 ---
 
