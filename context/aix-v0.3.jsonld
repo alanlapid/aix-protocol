@@ -1,0 +1,13 @@
+{
+  "@context": {
+    "@vocab": "https://schema.org/",
+    "time": "http://www.w3.org/2006/time#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "gm": "https://thegeometrical.com/ns/aix#",
+    "gm:subject": {"@type": "@id"},
+    "gm:object": {"@type": "@id"},
+    "gm:supersededBy": {"@type": "@id"},
+    "prov:wasDerivedFrom": {"@type": "@id"},
+    "gm:recordedAt": {"@type": "http://www.w3.org/2001/XMLSchema#dateTime"}
+  }
+}

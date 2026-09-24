@@ -1,0 +1,39 @@
+{
+ "@context": [
+  "https://schema.org/",
+  {
+   "gm": "https://thegeometrical.com/ns/aix#",
+   "prov": "http://www.w3.org/ns/prov#",
+   "time": "http://www.w3.org/2006/time#"
+  }
+ ],
+ "@graph": [
+  {
+   "@id": "gm:episode/1",
+   "@type": "InstantaneousEvent",
+   "data": {
+    "text": "The smallest valid .aix v0.3 record."
+   },
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "prov:wasAttributedTo": "process:example",
+   "source": "notes",
+   "timestamp": "2026-09-24T09:58:00+02:00"
+  }
+ ],
+ "@type": "gm:AixDocument",
+ "about": {
+  "@id": "gm:subject/example"
+ },
+ "gm:permissions": {
+  "read": [
+   "self"
+  ],
+  "readOnly": true,
+  "share": []
+ },
+ "gm:piiProtected": false,
+ "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+ "gm:scope": "self-only",
+ "prov:wasAttributedTo": "process:example",
+ "schemaVersion": "0.3.0-draft"
+}

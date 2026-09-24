@@ -324,7 +324,10 @@ files.
 | Format | Purpose | Identity Graph | Local-first | PII Layer | Federation | Token Reduction |
 |---|---|---|---|---|---|---|
 | **.aix** (this) | Episodic identity | ✅ 9-DIM | ✅ | ✅ patent | ✅ Nexus | ✅ 35–78% |
-| PAM (MS, 2605.11032) | Memory transfer | ✗ | ✗ | ✗ | ✗ | ✗ |
+| PAM (Ravindran, arXiv 2605.11032) | Memory transfer | ◐ identity component | — not specified | ✅ redaction | ✅ capability tokens | ✅ 69% artifact size vs. raw history |
+
+> Corrected in the v0.3 draft (2026-09-24) after reading the PAM paper: the previous row marked PAM ✗ in every column and attributed it to Microsoft; the paper has a single author and no stated affiliation. The "35–78%" range for .aix has no documented source in this repository; the measured figure is in AIX-SPEC-v0.3-draft.md §8.
+
 | MemGPT context | Session context | ✗ | ✗ | ✗ | ✗ | ✗ |
 | JSON-LD | Linked data | ✗ | ✓ | ✗ | ✗ | ✗ |
 

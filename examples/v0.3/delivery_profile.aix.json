@@ -1,0 +1,30 @@
+{
+ "aix": "aix-compact/0.3-draft",
+ "subject": "gm:subject/example",
+ "intent": "what",
+ "confidence": 0.8,
+ "created_at": "2026-09-24T10:00:00+00:00",
+ "pii_protected": true,
+ "budget": {
+  "max": 1200,
+  "used": 64
+ },
+ "permissions": {
+  "read": [
+   "agent:assistant"
+  ],
+  "read_only": true,
+  "expires_at": null
+ },
+ "identity": {
+  "roles": {
+   "founder": 0.7
+  },
+  "goals": [
+   "Close the pre-seed round"
+  ]
+ },
+ "memories": [
+  "[fact: [PERSON_1] —worksFor→ Acme Modular Homes (Co-Founder & COO, 2017-03–2020-12, past) <ref:gm:fact/1>]"
+ ]
+}

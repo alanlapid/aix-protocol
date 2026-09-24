@@ -107,7 +107,10 @@ Read the full spec: [AIX-SPEC.md](AIX-SPEC.md)
 | Format | Episodic identity | Local-first | PII layer | Federation | Token reduction |
 |---|---|---|---|---|---|
 | **.aix** (this) | ✅ 9-DIM | ✅ | ✅ patent | ✅ Nexus | ✅ 35–78% |
-| PAM (MS, 2605.11032) | ✗ | ✗ | ✗ | ✗ | ✗ |
+| PAM (Ravindran, arXiv 2605.11032) | ◐ identity component | — not specified | ✅ redaction | ✅ capability tokens | ✅ 69% artifact size vs. raw history |
+
+> Corrected in the v0.3 draft (2026-09-24) after reading the PAM paper: the previous row marked PAM ✗ in every column and attributed it to Microsoft; the paper has a single author and no stated affiliation. The "35–78%" range for .aix has no documented source in this repository; the measured figure is in AIX-SPEC-v0.3-draft.md §8.
+
 | MemGPT context | ✗ | ✗ | ✗ | ✗ | ✗ |
 | JSON-LD | ✗ | ✓ | ✗ | ✗ | ✗ |
 

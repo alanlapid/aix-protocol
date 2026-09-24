@@ -1,0 +1,192 @@
+{
+ "@context": [
+  "https://schema.org/",
+  {
+   "gm": "https://thegeometrical.com/ns/aix#",
+   "prov": "http://www.w3.org/ns/prov#",
+   "time": "http://www.w3.org/2006/time#"
+  }
+ ],
+ "@graph": [
+  {
+   "@id": "gm:action/1",
+   "@type": [
+    "CreateAction",
+    "gm:PublishAction"
+   ],
+   "actionStatus": {
+    "@id": "CompletedActionStatus"
+   },
+   "agent": {
+    "@id": "gm:entity/subject"
+   },
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "name": "Publication of the paper",
+   "prov:wasAttributedTo": "human:subject",
+   "result": {
+    "@id": "gm:entity/paper"
+   },
+   "startTime": "2026-08-13"
+  },
+  {
+   "@id": "gm:entity/acme",
+   "@type": "Corporation",
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "gm:subtype": "startup",
+   "name": "Acme Modular Homes",
+   "prov:wasAttributedTo": "human:subject"
+  },
+  {
+   "@id": "gm:entity/paper",
+   "@type": "ScholarlyArticle",
+   "datePublished": "2026-08",
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "name": "An example paper",
+   "prov:wasAttributedTo": "human:subject",
+   "sameAs": [
+    "https://example.org/records/1"
+   ]
+  },
+  {
+   "@id": "gm:entity/subject",
+   "@type": "Person",
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "name": "[PERSON_1]",
+   "prov:wasAttributedTo": "human:subject"
+  },
+  {
+   "@id": "gm:episode/1",
+   "@type": "InstantaneousEvent",
+   "data": {
+    "text": "Profile says Co-Founder & COO, 2017–2020."
+   },
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "gm:sensitivity": "personal",
+   "prov:wasAttributedTo": "process:ingest",
+   "source": "profile",
+   "timestamp": "2026-09-24"
+  },
+  {
+   "@id": "gm:era/professional/2",
+   "@type": "gm:Era",
+   "endDate": "2020-12",
+   "gm:ordinal": 2,
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "gm:system": "professional",
+   "name": "Industry years",
+   "prov:wasAttributedTo": "human:subject",
+   "startDate": "2017-01"
+  },
+  {
+   "@id": "gm:fact/0",
+   "@type": "gm:Fact",
+   "gm:object": "gm:entity/acme",
+   "gm:predicate": "worksFor",
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "gm:role": {
+    "@type": "OrganizationRole",
+    "roleName": "Partner"
+   },
+   "gm:status": "superseded",
+   "gm:subject": "gm:entity/subject",
+   "gm:supersededBy": "gm:fact/1",
+   "prov:wasAttributedTo": "human:subject"
+  },
+  {
+   "@id": "gm:fact/1",
+   "@type": "gm:Fact",
+   "gm:confidence": 0.95,
+   "gm:memoryLevel": "ltm",
+   "gm:object": "gm:entity/acme",
+   "gm:predicate": "worksFor",
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "gm:role": {
+    "@type": "OrganizationRole",
+    "endDate": "2020-12",
+    "roleName": "Co-Founder & COO",
+    "startDate": "2017-03"
+   },
+   "gm:status": "active",
+   "gm:subject": "gm:entity/subject",
+   "prov:wasAttributedTo": "human:subject",
+   "prov:wasDerivedFrom": [
+    "gm:episode/1"
+   ]
+  },
+  {
+   "@id": "gm:procedure/1",
+   "@type": "HowTo",
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "name": "Publish a technical artifact",
+   "prov:wasAttributedTo": "human:subject",
+   "step": [
+    {
+     "@type": "HowToStep",
+     "position": 1,
+     "text": "Publish the code"
+    },
+    {
+     "@type": "HowToStep",
+     "position": 2,
+     "text": "Publish the paper"
+    }
+   ]
+  },
+  {
+   "@id": "gm:receipt/1",
+   "@type": "gm:Receipt",
+   "gm:facts": [
+    "gm:fact/1"
+   ],
+   "gm:integrity": {
+    "algorithm": "merkle-sha256",
+    "root": "0000000000000000000000000000000000000000000000000000000000000000"
+   },
+   "gm:purpose": "prepare a bio",
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "gm:servedTo": "agent:assistant",
+   "prov:wasAttributedTo": "process:nexus"
+  },
+  {
+   "@id": "gm:review/1",
+   "@type": "ClaimReview",
+   "claimReviewed": "Founded Acme in 2019",
+   "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+   "itemReviewed": {
+    "@type": "Claim",
+    "appearance": {
+     "@id": "gm:entity/paper"
+    }
+   },
+   "prov:wasAttributedTo": "human:subject",
+   "reviewBody": "Co-founded in 2017",
+   "reviewRating": {
+    "@type": "Rating",
+    "alternateName": "False",
+    "ratingValue": 1
+   }
+  }
+ ],
+ "@type": "gm:AixDocument",
+ "about": {
+  "@id": "gm:subject/example"
+ },
+ "gm:integrity": {
+  "algorithm": "merkle-sha256",
+  "root": "7fdd5448712b5e780a8640d21393e5358b4891150c7092da3a1d09fb5f2688ac"
+ },
+ "gm:permissions": {
+  "expiresAt": "2026-12-31T23:59:59Z",
+  "read": [
+   "self",
+   "agent:assistant"
+  ],
+  "readOnly": true,
+  "share": []
+ },
+ "gm:piiProtected": true,
+ "gm:recordedAt": "2026-09-24T10:00:00+00:00",
+ "gm:scope": "self-only",
+ "prov:wasAttributedTo": "process:example",
+ "schemaVersion": "0.3.0-draft"
+}

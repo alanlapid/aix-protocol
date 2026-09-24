@@ -6,6 +6,17 @@ are documented here. Format follows
 follows the rules in `AIX-SPEC.md` Section 6 (semantic versioning of the
 spec itself, independent of `substrate_version`).
 
+## [0.3.0-draft] — unreleased (local draft branch)
+
+- JSON-LD over schema.org, W3C OWL-Time and W3C PROV-O; `gm:` namespace only for the delta (memory level, scope, sensitivity, status, era, receipt).
+- Records tolerant of partial data: only `@id`, `@type`, `gm:recordedAt`, `prov:wasAttributedTo` are required.
+- Honest time: dates keep their source precision; date-times require an offset.
+- Never delete: `gm:status: superseded` + `gm:supersededBy`.
+- Vocabulary governance: pending → stable, undeclared terms flagged.
+- Delivery profile `aix-compact/0.3-draft`: one representation, integrity root kept in the producer's receipt, data-not-instructions framing.
+- `aix_v03.py` (stdlib), `schema/aix-v0.3.schema.json`, `context/aix-v0.3.jsonld`, `examples/v0.3/`, property-based round-trip tests.
+- `AIX_VS_STANDARDS.md`: OKF → export, PAM → wrap. Corrected the v0.2 comparison rows for PAM.
+
 ## [0.2.0] — August 2026
 
 ### Added
