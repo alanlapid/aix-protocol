@@ -86,6 +86,10 @@ VOCABULARY: dict[str, dict[str, str]] = {
     "gm:purpose": {"status": "pending", "comment": "Declared purpose of an access (mandatory in Nexus)."},
     "gm:facts": {"status": "pending", "comment": "Records a gm:Receipt covers."},
     "gm:PublishAction": {"status": "pending", "comment": "Subclass of schema:CreateAction: making a work public."},
+    "gm:CausalLink": {"status": "pending", "comment": "Why something happened: cause → effect, with the rationale in description."},
+    "gm:cause": {"status": "pending", "comment": "Cause record of a gm:CausalLink."},
+    "gm:effect": {"status": "pending", "comment": "Effect record of a gm:CausalLink."},
+    "gm:causalType": {"status": "pending", "comment": "causes | motivates | orients | blocks."},
 }
 
 
