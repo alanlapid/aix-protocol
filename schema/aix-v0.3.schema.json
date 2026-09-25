@@ -24,7 +24,16 @@
     "gm:integrity": {
       "type": "object",
       "required": ["algorithm", "root"],
-      "properties": {"algorithm": {"const": "merkle-sha256"}, "root": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+      "properties": {
+        "algorithm": {"const": "merkle-sha256"}, "root": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "headerDigest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "signature": {
+          "type": "object", "required": ["algorithm", "keyId", "publicKey", "value"], "additionalProperties": false,
+          "properties": {"algorithm": {"const": "ed25519"}, "keyId": {"type": "string", "pattern": "^ed25519:[0-9a-f]{16}$"},
+                         "publicKey": {"type": "string", "contentEncoding": "base64"}, "value": {"type": "string", "contentEncoding": "base64"}}
+        }
+      },
+      "dependentRequired": {"signature": ["headerDigest"]}
     },
     "@graph": {"type": "array", "items": {"$ref": "#/$defs/record"}}
   },

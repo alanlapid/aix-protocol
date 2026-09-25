@@ -22,7 +22,9 @@ Design rules (AIX-SPEC-v0.3-draft.md):
   - Lossless round-trip: `dump(load(doc)) == canonical(doc)`.
 
 Pure Python standard library, no third-party dependencies (the JSON
-Schema in schema/ is provided for external validators).
+Schema in schema/ is provided for external validators). The optional
+Ed25519 signature (`sign`, `verify_signature`) needs the `cryptography`
+package; everything else works without it.
 
 Usage:
     from aix_v03 import Document, Record, load, dump, validate
@@ -35,6 +37,7 @@ Usage:
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import re
@@ -150,6 +153,11 @@ def _canonico(obj: Any) -> str:
     return json.dumps(obj, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
 
 
+def _recanonizar(obj: dict[str, Any]) -> dict[str, Any]:
+    out: dict[str, Any] = json.loads(_canonico(obj))
+    return out
+
+
 def merkle_root(records: list[dict[str, Any]]) -> str:
     """Merkle-SHA256 over the canonical JSON of each record (same scheme as v0.2)."""
     nivel = [hashlib.sha256(_canonico(r).encode()).hexdigest() for r in records] or [hashlib.sha256(b"").hexdigest()]
@@ -173,7 +181,77 @@ def dump(doc: Document, integrity: bool = False) -> dict[str, Any]:
     }
     if integrity:
         out["gm:integrity"] = {"algorithm": "merkle-sha256", "root": merkle_root(records)}
-    return json.loads(_canonico(out))  # canonical key order
+    return _recanonizar(out)  # canonical key order
+
+
+# --- Ed25519 signature (optional) ------------------------------------------------------------
+#
+# The Merkle root covers only @graph. The signature also covers the header
+# (subject, scope, permissions, piiProtected…), so a signed document cannot
+# be re-scoped or have its permissions widened without breaking it.
+# Signed message: b"aix-v0.3/ed25519|" + root + b"|" + headerDigest.
+
+SIGNATURE_DOMAIN = "aix-v0.3/ed25519"
+
+
+def header_digest(data: dict[str, Any]) -> str:
+    """SHA-256 over the canonical document without @graph and gm:integrity."""
+    header = {k: v for k, v in data.items() if k not in ("@graph", "gm:integrity")}
+    return hashlib.sha256(_canonico(header).encode()).hexdigest()
+
+
+def _mensaje(root: str, digest: str) -> bytes:
+    return f"{SIGNATURE_DOMAIN}|{root}|{digest}".encode()
+
+
+def key_id(public_key_raw: bytes) -> str:
+    return "ed25519:" + hashlib.sha256(public_key_raw).hexdigest()[:16]
+
+
+def sign(data: dict[str, Any], private_key_raw: bytes) -> dict[str, Any]:
+    """Return a copy of a dumped document with gm:integrity (root, headerDigest)
+    and an Ed25519 signature. `private_key_raw` is the 32-byte seed.
+    A signature is over bytes: after load() + dump() the document must be
+    signed again (the signature is not part of the round-trip)."""
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from cryptography.hazmat.primitives.serialization import Encoding, PublicFormat
+
+    clave = Ed25519PrivateKey.from_private_bytes(private_key_raw)
+    publica = clave.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
+    out = {k: v for k, v in data.items() if k != "gm:integrity"}
+    root, digest = merkle_root(out.get("@graph", [])), header_digest(out)
+    out["gm:integrity"] = {
+        "algorithm": "merkle-sha256", "root": root, "headerDigest": digest,
+        "signature": {"algorithm": "ed25519", "keyId": key_id(publica),
+                      "publicKey": base64.b64encode(publica).decode(),
+                      "value": base64.b64encode(clave.sign(_mensaje(root, digest))).decode()},
+    }
+    return _recanonizar(out)
+
+
+def verify_signature(data: dict[str, Any], trusted_public_key_raw: bytes | None = None) -> bool:
+    """True if the Merkle root, the header digest and the Ed25519 signature
+    all match. Without `trusted_public_key_raw` it only proves the document
+    was signed by the key it carries (integrity, not authorship): pass the
+    producer's known key to check who signed it."""
+    integ = data.get("gm:integrity") or {}
+    firma = integ.get("signature") or {}
+    if firma.get("algorithm") != "ed25519" or not verify(data) or integ.get("headerDigest") != header_digest(data):
+        return False
+    try:
+        from cryptography.exceptions import InvalidSignature
+        from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
+        publica = base64.b64decode(firma["publicKey"], validate=True)
+        if trusted_public_key_raw is not None and publica != trusted_public_key_raw:
+            return False
+        if firma.get("keyId") != key_id(publica):
+            return False
+        Ed25519PublicKey.from_public_bytes(publica).verify(base64.b64decode(firma["value"], validate=True),
+                                                          _mensaje(integ["root"], integ["headerDigest"]))
+        return True
+    except (InvalidSignature, ValueError, KeyError, TypeError):
+        return False
 
 
 def load(data: dict[str, Any]) -> Document:
@@ -197,7 +275,7 @@ def load(data: dict[str, Any]) -> Document:
 def verify(data: dict[str, Any]) -> bool:
     """True if the document carries gm:integrity and its records match it."""
     integ = data.get("gm:integrity")
-    return bool(integ) and merkle_root(data.get("@graph", [])) == integ.get("root")
+    return isinstance(integ, dict) and merkle_root(data.get("@graph", [])) == integ.get("root")
 
 
 def _fechas(obj: Any, ruta: str, errores: list[str]) -> None:
@@ -264,6 +342,15 @@ def validate(data: dict[str, Any]) -> tuple[list[str], list[str]]:
                 avisos.append(f"@graph[{i}]: {clave} points outside the document ({v})")
     if "gm:integrity" in data and not verify(data):
         errores.append("gm:integrity does not match the records")
+    integ = data.get("gm:integrity") or {}
+    if "signature" in integ:
+        try:
+            import cryptography  # noqa: F401
+        except ImportError:
+            avisos.append("gm:integrity.signature present but not checked (install 'cryptography')")
+        else:
+            if not verify_signature(data):
+                errores.append("gm:integrity.signature is invalid (records, header or signature changed)")
     return errores, avisos
 
 

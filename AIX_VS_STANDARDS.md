@@ -37,6 +37,8 @@ They do not compete. Procedures (`HowTo`) and curated concepts map
 naturally to OKF concept files (`type`, `title`, `description`, `sources`,
 `generated`, `verified`). Action: an `.aix → OKF bundle` exporter for
 procedural and concept records, never for personal or sensitive records.
+*Done in the draft:* `aix_okf.py` (procedures → `Playbook` concepts, `index.md`, `log.md`;
+episode ids never leave, only their count as a scope-descriptor source).
 
 **PAM → wrap.** PAM overlaps most with .aix and is stronger in transport
 security: signed Merkle-DAG root, capability tokens with scope expressions,
@@ -50,6 +52,12 @@ working design. Actions:
 2. Adopt a signed integrity root (Ed25519) as an optional `gm:integrity`
    field.
 3. Keep the delivery-framing idea (already adopted in the delivery profile).
+
+*Done in the draft:* 1 → `aix_pam.py`, byte-compatible with the PAM SDK
+(entry ids, root hash and signature cross-checked against its models; where
+the SDK code and its JSON Schema differ, the bridge follows the code and can
+emit the schema layout). 2 → `aix_v03.sign` / `verify_signature`, over the
+Merkle root plus a header digest.
 
 ## Correction needed in the published v0.2
 

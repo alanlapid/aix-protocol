@@ -16,6 +16,9 @@ spec itself, independent of `substrate_version`).
 - Delivery profile `aix-compact/0.3-draft`: one representation, integrity root kept in the producer's receipt, data-not-instructions framing.
 - `aix_v03.py` (stdlib), `schema/aix-v0.3.schema.json`, `context/aix-v0.3.jsonld`, `examples/v0.3/`, property-based round-trip tests.
 - `AIX_VS_STANDARDS.md`: OKF → export, PAM → wrap. Corrected the v0.2 comparison rows for PAM.
+- Optional Ed25519 signature in `gm:integrity` over Merkle root + header digest (`sign`, `verify_signature`).
+- `aix_pam.py`: .aix ↔ Portable Agent Memory bridge, byte-compatible with the PAM SDK (ids, root hash, signature).
+- `aix_okf.py`: procedures and concepts → Open Knowledge Format v0.2 bundle.
 
 ## [0.2.0] — August 2026
 

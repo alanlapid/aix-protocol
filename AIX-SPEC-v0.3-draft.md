@@ -61,6 +61,23 @@ must be checked before serving, not only logged (§6).
 - `gm:integrity` is OPTIONAL in the document. When a document is
   delivered to an agent, the integrity root MAY be kept by the producer
   in its delivery receipt instead of travelling in the payload (§8).
+- **Signature (OPTIONAL, pending).** `gm:integrity` MAY carry an Ed25519
+  signature. The Merkle root covers only `@graph`, so the signature also
+  covers the header: `headerDigest` is SHA-256 over the canonical document
+  without `@graph` and `gm:integrity`, and the signed message is
+  `aix-v0.3/ed25519|<root>|<headerDigest>`. A signed document cannot be
+  re-scoped or have its permissions widened without breaking it.
+
+  ```json
+  "gm:integrity": {"algorithm": "merkle-sha256", "root": "<64 hex>", "headerDigest": "<64 hex>",
+                   "signature": {"algorithm": "ed25519", "keyId": "ed25519:<16 hex>",
+                                 "publicKey": "<base64>", "value": "<base64>"}}
+  ```
+
+  The embedded public key only proves integrity. Authorship requires the
+  consumer to check the key against one it already trusts for that
+  producer. A signature is over bytes, so re-serializing a document
+  (`load` + `dump`) requires signing it again.
 
 ---
 
@@ -194,13 +211,36 @@ What a producer hands to an agent for one task. One representation only:
   becomes `gm:memoryLevel` (`from_v02` in the reference implementation).
 - Round-trip: `dump(load(doc))` MUST equal the canonical `doc`
   (property-tested in `tests/test_aix_v03.py`).
+- **Portable Agent Memory (PAM 1.0, arXiv 2605.11032).** `aix_pam.py`
+  projects a document onto PAM's five components:
+  - `gm:Fact` → semantic;
+  - `InstantaneousEvent` and completed actions → episodic;
+  - `HowTo` → procedural;
+  - active `PlanAction` → working;
+  - the header → identity.
+
+  PAM → .aix maps each entry back. Entry ids, root hash and signature are
+  byte-compatible with the PAM SDK and cross-checked against its models.
+  The bridge follows the SDK code where it differs from the SDK's
+  published JSON Schema.
+
+  From .aix to PAM to .aix is lossless: the original document travels in
+  PAM `metadata`, bound by tags to the hashed identity entry. Sensitive
+  records never cross the bridge.
+- **Open Knowledge Format (OKF v0.2).** `aix_okf.py` exports `HowTo`
+  records (and named concepts) as an OKF bundle, i.e. Markdown files with
+  YAML frontmatter plus `index.md`. It never exports personal or
+  sensitive records.
 
 ---
 
 ### 10. Reference implementation
 
 - `aix_v03.py` (standard library only): `Document`, `Record`, `load`, `dump`,
-  `validate` (errors vs. warnings), `verify`, `from_v02`, `VOCABULARY`.
+  `validate` (errors vs. warnings), `verify`, `from_v02`, `VOCABULARY`;
+  optional `sign` / `verify_signature` (Ed25519, needs `cryptography`).
+- `aix_pam.py`: `to_pam`, `to_aix`, `sign`, `verify` (needs `blake3`).
+- `aix_okf.py` (standard library only): `to_okf_bundle`.
 - `schema/aix-v0.3.schema.json` (JSON Schema 2020-12) for external validators.
 - `context/aix-v0.3.jsonld` (JSON-LD context).
 - `examples/v0.3/` (synthetic): minimal, full, converted from v0.2, delivery profile.

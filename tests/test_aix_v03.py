@@ -41,6 +41,52 @@ class TestExamples(unittest.TestCase):
         self.assertIn("gm:integrity does not match the records", a.validate(data)[0])
 
 
+class TestSignature(unittest.TestCase):
+    """Ed25519 over Merkle root + header digest (needs `cryptography`)."""
+
+    def setUp(self) -> None:
+        try:
+            from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+            from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat, PublicFormat
+        except ImportError:
+            self.skipTest("cryptography not installed")
+        k = Ed25519PrivateKey.generate()
+        self.priv = k.private_bytes(Encoding.Raw, PrivateFormat.Raw, NoEncryption())
+        self.pub = k.public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
+        self.otra = Ed25519PrivateKey.generate().public_key().public_bytes(Encoding.Raw, PublicFormat.Raw)
+        self.data = a.sign(json.loads((EJEMPLOS / "full.aix.jsonld").read_text()), self.priv)
+
+    def test_signed_document_verifies_and_validates(self) -> None:
+        self.assertTrue(a.verify_signature(self.data))
+        self.assertTrue(a.verify_signature(self.data, trusted_public_key_raw=self.pub))
+        self.assertEqual(a.validate(self.data)[0], [])
+
+    def test_untrusted_key_is_rejected(self) -> None:
+        self.assertFalse(a.verify_signature(self.data, trusted_public_key_raw=self.otra))
+
+    def test_tampering_with_records_or_header_breaks_the_signature(self) -> None:
+        for mutar in (lambda d: d["@graph"][0].__setitem__("name", "tampered"),
+                      lambda d: d.__setitem__("gm:scope", "public"),
+                      lambda d: d["gm:permissions"]["read"].append("agent:intruder")):
+            d = json.loads(json.dumps(self.data))
+            mutar(d)
+            self.assertFalse(a.verify_signature(d))
+            self.assertTrue(a.validate(d)[0])
+
+    def test_attacker_cannot_re_sign_with_the_embedded_key_only(self) -> None:
+        d = json.loads(json.dumps(self.data))
+        d["gm:scope"] = "public"
+        d["gm:integrity"]["headerDigest"] = a.header_digest(d)  # digest updated, signature not
+        self.assertFalse(a.verify_signature(d))
+
+    def test_signed_example_matches_json_schema(self) -> None:
+        try:
+            import jsonschema
+        except ImportError:
+            self.skipTest("jsonschema not installed")
+        jsonschema.validate(self.data, json.loads((RAIZ / "schema" / "aix-v0.3.schema.json").read_text()))
+
+
 class TestRules(unittest.TestCase):
     def _doc(self, **props: object) -> dict:
         d = a.Document(subject="gm:subject/x", recorded_at=T)
