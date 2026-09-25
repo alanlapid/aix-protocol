@@ -29,8 +29,8 @@ package; everything else works without it.
 Usage:
     from aix_v03 import Document, Record, load, dump, validate
     doc = Document(subject="gm:subject/abc", scope="self-only")
-    doc.add(Record("gm:fact/1", "gm:Fact", "2026-09-24T10:00:00+00:00", "human:alan",
-                   {"gm:subject": "gm:entity/alan", "gm:predicate": "worksFor", "gm:object": "gm:entity/kiwi"}))
+    doc.add(Record("gm:fact/1", "gm:Fact", "2026-09-24T10:00:00+00:00", "human:subject",
+                   {"gm:subject": "gm:entity/subject", "gm:predicate": "worksFor", "gm:object": "gm:entity/acme"}))
     data = dump(doc)
     assert dump(load(data)) == data
 """
