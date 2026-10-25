@@ -61,7 +61,7 @@ A financial institution (Euro Exchange Bank pattern):
 1. Soma ingests: contracts, client communications, internal decisions.
 2. Each document becomes one or more `.aix` envelopes.
 3. `federate` rules define:
-   - Advisors see `decisions` + `skills`, but not `text`.
+   - Advisors see `decisions` + `entities`, but not `text`.
    - The compliance team sees all fields.
    - External agents see only metadata.
 4. Agents query Soma via the Self Memory API.
@@ -76,5 +76,5 @@ Individual employees have Self instances. The organization has a Soma
 instance. **Nexus** governs what flows between them.
 
 A Self envelope from an employee can federate specific fields to Soma
-(e.g., `skills`, `availability`) without exposing personal decisions or
+(e.g., `entities`, `patterns`) without exposing personal decisions or
 communications — see `AIX-SPEC.md` Section 11 for the full protocol.

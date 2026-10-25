@@ -49,7 +49,7 @@ continuity lives in the payload, not in the connection. The envelope's
 | MCP construct | `.aix` binding |
 |---|---|
 | `Resource.uri` | `aix://{perimeter_type}/{scope_id}/{envelope_id}` — e.g. `aix://soma/acme_legal/env_7f3a` ([RFC 3986](https://www.rfc-editor.org/rfc/rfc3986) custom scheme) |
-| `ResourceTemplate.uriTemplate` | `aix://{perimeter_type}/{scope_id}/recall{?q,roles,max_tokens}` ([RFC 6570](https://www.rfc-editor.org/rfc/rfc6570)) |
+| `ResourceTemplate.uriTemplate` | `aix://{perimeter_type}/{scope_id}/recall{?q,memory_roles,max_tokens}` ([RFC 6570](https://www.rfc-editor.org/rfc/rfc6570)) |
 | `mimeType` | `application/x-aix-memory; version=0.2` (spec §3.1 plus version parameter) |
 | `size` | bytes of the serialised **derived** envelope |
 | `_meta` | `com.thegeometrical.aix/tokenBudget` mirrors `token_budget` |
@@ -106,7 +106,7 @@ envelope.
 | Argument | Type | Meaning |
 |---|---|---|
 | `q` | string | case-insensitive filter over granted fields |
-| `roles` | string[] | memory roles to include (`memories[].role`) |
+| `memory_roles` | string[] | memory roles to include (`memories[].role`) |
 | `max_tokens` | integer ≥ 1 | token budget for the result |
 
 Result (abridged):

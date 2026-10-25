@@ -35,6 +35,13 @@ spec itself, independent of `substrate_version`).
   contradicted §3.5 and `examples/soma_contract.aix` (where `roles` are
   roles of the receiving perimeter). §11.2 now matches §3.5. Wording
   only — no schema change
+- `AIX-SPEC.md` §11.2 example granted a `skills` field, which is not a
+  `content` field (§3.4). Now `entities`; same in `SOMA-USAGE.md`
+- `AIX-SPEC.md` §3.5 keyed the Self perimeter as `self:{device_id}`;
+  now `self:{subject_id}`, matching §11.1
+- `aix_recall` argument and recall URI parameter `roles` renamed to
+  `memory_roles`, so it is not confused with `federate.roles` (the
+  requester's role)
 
 ### Not changed
 

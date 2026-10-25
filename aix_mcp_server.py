@@ -340,7 +340,7 @@ class AIXMCPServer:
 
     def _template(self) -> str:
         kind, scope_id = self._scope()
-        return f"aix://{kind}/{scope_id}/recall{{?q,roles,max_tokens}}"
+        return f"aix://{kind}/{scope_id}/recall{{?q,memory_roles,max_tokens}}"
 
     # -- helpers -------------------------------------------------------------
 
@@ -476,7 +476,7 @@ class AIXMCPServer:
                 "type": "object",
                 "properties": {
                     "q": {"type": "string", "description": "Case-insensitive text filter."},
-                    "roles": {"type": "array", "items": {"type": "string"}, "description": "Memory roles to include."},
+                    "memory_roles": {"type": "array", "items": {"type": "string"}, "description": "Memory roles to include (memories[].role)."},
                     "max_tokens": {"type": "integer", "minimum": 1, "description": "Token budget for the result."},
                 },
                 "additionalProperties": False,
@@ -500,7 +500,7 @@ class AIXMCPServer:
             return self._complete(
                 {"content": [{"type": "text", "text": "max_tokens must be a positive integer."}], "isError": True}
             )
-        derived, sources = self._recall(args.get("q"), args.get("roles"), max_tokens)
+        derived, sources = self._recall(args.get("q"), args.get("memory_roles"), max_tokens)
         result: dict[str, Any] = {
             "content": [{"type": "text", "text": render_text(derived, self.perimeter)}],
             "_meta": {f"{META_PREFIX}/sources": sources},
@@ -548,7 +548,7 @@ class AIXMCPServer:
             max_tokens = query.get("max_tokens", [None])[0]
             derived, _ = self._recall(
                 query.get("q", [None])[0],
-                query["roles"][0].split(",") if "roles" in query else None,
+                query["memory_roles"][0].split(",") if "memory_roles" in query else None,
                 int(max_tokens) if max_tokens and max_tokens.isdigit() else None,
             )
         else:

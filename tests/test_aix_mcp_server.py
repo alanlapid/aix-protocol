@@ -158,6 +158,18 @@ class TestServer(unittest.TestCase):
         derived = json.loads(_call(self.server, "resources/read", {"uri": uri})["result"]["contents"][0]["text"])
         self.assertGreaterEqual(len(derived["memories"]), 1)
 
+    def test_recall_filters_by_memory_roles(self):
+        # memory_roles filters memories[].role; it is not federate.roles
+        args = {"name": "aix_recall", "arguments": {"memory_roles": ["legal_analyst"]}}
+        kept = _call(self.server, "tools/call", args)["result"]["structuredContent"]
+        self.assertEqual(len(kept["memories"]), 3)
+        args["arguments"]["memory_roles"] = ["advisor"]
+        dropped = _call(self.server, "tools/call", args)["result"]["structuredContent"]
+        self.assertEqual(dropped["memories"], [])
+        uri = "aix://soma/acme_corp_advisory/recall?memory_roles=legal_analyst"
+        derived = json.loads(_call(self.server, "resources/read", {"uri": uri})["result"]["contents"][0]["text"])
+        self.assertEqual(len(derived["memories"]), 3)
+
     def test_tools_call_with_extension(self):
         result = _call(self.server, "tools/call", {"name": "aix_recall", "arguments": {"max_tokens": 4000}})["result"]
         self.assertIn("structuredContent", result)
