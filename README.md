@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![Status](https://img.shields.io/badge/status-draft-yellow)](https://github.com/alanlapid/aix-protocol)
 [![Tests](https://github.com/alanlapid/aix-protocol/actions/workflows/test.yml/badge.svg)](https://github.com/alanlapid/aix-protocol/actions/workflows/test.yml)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.23640824-blue)](https://doi.org/10.5281/zenodo.23640824)
 
 ## The Problem
 
@@ -44,7 +45,7 @@ AIX Protocol
 │   ├── federate    — granular field-level permissions
 │   ├── perimeters  — self / soma / axis / public
 │   └── integrity   — Merkle signature
-└── Transport       — how envelopes move (v0.2)
+└── Transport       — MCP binding (MCP-BINDING.md)
 
 Used by:
 ├── Self    — personal episodic memory substrate
@@ -54,6 +55,27 @@ Used by:
 
 Nexus v0.1 ships inside this repo (`AIX-SPEC.md` Section 11) — it'll
 move to its own repository once it outgrows being a subsection here.
+
+## `.aix` over MCP
+
+MCP is the pipe. `.aix` is the payload.
+
+MCP standardises how agents reach servers; it does not standardise what
+a memory looks like. [`MCP-BINDING.md`](MCP-BINDING.md) carries `.aix`
+envelopes inside ordinary MCP resources and tool results, with Nexus
+permissions applied before anything is serialised. No change to MCP
+core. Targets the stateless MCP revision 2026-07-28.
+
+Run the reference server (stdlib only, stdio):
+
+```bash
+python aix_mcp_server.py --store examples \
+  --perimeter soma:acme_corp_advisory --role advisor
+```
+
+The advisor perimeter receives `decisions` and `entities` from
+`examples/soma_contract.aix` — never `text` — with a recomputed Merkle
+root that points back to the original via `signature.derived_from`.
 
 ## Token Reduction
 
@@ -100,7 +122,16 @@ env2 = AIXEnvelope.from_file("my_memory.aix")
 
 ## Specification
 
-Read the full spec: [AIX-SPEC.md](AIX-SPEC.md)
+Read the full spec: [AIX-SPEC.md](AIX-SPEC.md) · MCP binding:
+[MCP-BINDING.md](MCP-BINDING.md)
+
+## Papers
+
+| Paper | Version | DOI |
+|---|---|---|
+| AIX Protocol: An Open Format for Portable Episodic Identity Memory with Permission-Scoped Federation | v1.1 (Oct 2026) — adds `.aix` over MCP | [10.5281/zenodo.23640824](https://doi.org/10.5281/zenodo.23640824) |
+| | v1.0 (Aug 2026) | [10.5281/zenodo.21923809](https://doi.org/10.5281/zenodo.21923809) |
+| Minimum Viable Exposure | v1.0 (Oct 2026) | [10.5281/zenodo.23457060](https://doi.org/10.5281/zenodo.23457060) |
 
 ## Comparison
 

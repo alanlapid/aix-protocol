@@ -177,7 +177,7 @@ protocol description in Section 11; this subsection covers the schema.
       "expires_at": "ISO8601 | null",
       "read_only": true
     },
-    "self:{device_id}": {
+    "self:{subject_id}": {
       "roles": ["*"],
       "fields": ["*"],
       "expires_at": null,
@@ -393,7 +393,7 @@ permissions at export time:
   "federate": {
     "soma:bank_001": {
       "roles": ["employee", "advisor"],
-      "fields": ["decisions", "skills"],
+      "fields": ["decisions", "entities"],
       "expires_at": "2026-12-31T00:00:00Z",
       "read_only": true
     }
@@ -401,9 +401,10 @@ permissions at export time:
 }
 ```
 
-This declares: the organization `soma:bank_001` may read the
-`decisions` and `skills` fields of memories where the subject's role
-matches `employee` or `advisor`, until 2026-12-31, read-only.
+This declares: requesters from the organization `soma:bank_001` acting
+in the role `employee` or `advisor` may read the `decisions` and
+`entities` fields, until 2026-12-31, read-only. `roles` are roles of the
+receiving perimeter (Section 3.5), not of the subject.
 
 Fields not listed in `fields[]` are invisible to the receiving
 perimeter — including `text` if not listed.
@@ -425,13 +426,20 @@ perimeter — including `text` if not listed.
 Any modification to any memory record changes the Merkle root, making
 tampering detectable.
 
+**Proposed for v0.3 — `signature.derived_from` (optional).** When an
+envelope is filtered by Nexus before it crosses a perimeter, the result
+is a *derived* envelope whose `root` is recomputed over the disclosed
+records; `derived_from` carries the root of the envelope it came from.
+Defined in `MCP-BINDING.md` Section 5.
+
 #### 11.4 What Nexus Does NOT Define (yet)
 
 Nexus v0.1 defines the permission schema only. The following are
 planned for Nexus v0.2:
 
 - Transport protocol (how `.aix` envelopes move between perimeters over
-  the network).
+  the network). *Update (October 2026):* MCP now serves as transport —
+  see `MCP-BINDING.md`.
 - Key exchange and authentication between perimeters.
 - Revocation of `federate` permissions.
 - Audit log format for cross-perimeter access.

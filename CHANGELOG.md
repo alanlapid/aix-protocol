@@ -6,6 +6,47 @@ are documented here. Format follows
 follows the rules in `AIX-SPEC.md` Section 6 (semantic versioning of the
 spec itself, independent of `substrate_version`).
 
+## [0.3.0-draft] — October 2026
+
+### Added
+
+- `MCP-BINDING.md`: `.aix` over MCP, binding v0.1 — MCP is the pipe,
+  `.aix` is the payload. Targets MCP revision 2026-07-28 (stateless),
+  degrades to 2025-11-25. Defined in the AIX Protocol paper v1.1,
+  Section 7 (DOI [10.5281/zenodo.23640824](https://doi.org/10.5281/zenodo.23640824))
+- `aix_mcp_server.py`: reference MCP server (stdio, stdlib only) —
+  `server/discover`, `tools/list`, `tools/call` (`aix_recall`),
+  `resources/list`, `resources/templates/list`, `resources/read`, plus
+  the legacy `initialize` handshake
+- Unofficial MCP extension `com.thegeometrical/aix` (SEP-2133 naming)
+- `signature.derived_from` (optional, proposed for spec v0.3): links a
+  federated (derived) envelope to the root of the envelope it came from
+- `tests/test_aix_mcp_server.py`: 26 tests covering conformance items
+  C1–C8, including a stdio round-trip
+- README: Papers section with Zenodo DOIs; MCP section
+
+### Changed
+
+- README stack diagram: transport is now the MCP binding
+
+### Fixed
+
+- `AIX-SPEC.md` §11.2 described `roles` as the *subject's* role, which
+  contradicted §3.5 and `examples/soma_contract.aix` (where `roles` are
+  roles of the receiving perimeter). §11.2 now matches §3.5. Wording
+  only — no schema change
+- `AIX-SPEC.md` §11.2 example granted a `skills` field, which is not a
+  `content` field (§3.4). Now `entities`; same in `SOMA-USAGE.md`
+- `AIX-SPEC.md` §3.5 keyed the Self perimeter as `self:{device_id}`;
+  now `self:{subject_id}`, matching §11.1
+- `aix_recall` argument and recall URI parameter `roles` renamed to
+  `memory_roles`, so it is not confused with `federate.roles` (the
+  requester's role)
+
+### Not changed
+
+- `aix_version` stays `0.2`; existing files remain valid unchanged
+
 ## [0.2.0] — August 2026
 
 ### Added
